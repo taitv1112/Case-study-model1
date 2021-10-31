@@ -3,11 +3,148 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Flappy Bird</title>
 </head>
-<body>
-    <canvas id="gamezone" width="900" height="500"></canvas>
-    <p id="score">score: 0</p>
+<body style="background-image: url('images/backgroup.jpg')">
+    <canvas id="gamezone" width="900" height="500" style="border: 1px solid black;"></canvas>
+    <h1 id="score" style="text-align: left">score: 0</h1>
+    <button onclick="start() "> Play game</button>
+    <button onclick="reset() "> Reset</button>
+    <h1 id="hightScore">Hight Score: 0 </h1>
+
 </body>
-<script src="main.js"></script>
+<script>
+    let canvas = document.getElementById('gamezone');
+    let context = canvas.getContext('2d');
+    let scoreshow = document.getElementById('score');
+    let highScoreshow = document.getElementById("hightScore");
+    let score = 0;
+    let max = 0 ;
+    let count = 0;
+    const birdImg = new Image();
+    const backGround = new Image();
+    const pipeNorth = new Image();
+    const pipeSouth = new Image();
+    birdImg.src = "images/bird.png";
+    backGround.src = "images/nenchinh.png";
+    pipeNorth.src = "images/pipeNorth.png";
+    pipeSouth.src = "images/pipeSouth.png";
+    let fly = new Audio();
+    let point = new Audio();
+    let gamOver = new Audio();
+    fly.src = "sounds/fly.mp3";
+    point.src = "sounds/score.mp3";
+    gamOver.src = "sounds/gameover.mp3";
+
+    const spaceBetweenTwoPipesY = 150;
+    let spaceNorthToSouth; // biến này là khoảng cách từ đầu ống trên đến vị trí đầu ống dưới
+    // tạo ra 1 object chim với tọa độ x y là 1 nữa canvas
+    window.onload = function (){
+
+        context.drawImage(backGround,0,0);
+        context.drawImage(birdImg,canvas.width/5,canvas.height/2)
+
+    }
+    class Bird {
+        x;
+        y;
+        speed;
+
+        constructor(x, y, speed) {
+            this.speed = speed;
+            this.x = x;
+            this.y = y;
+        }
+        updateBird() {
+            this.x = backGround.width / 5;
+            this.y = backGround.height / 2;
+        }
+    }
+
+    let bird = new Bird(backGround.width / 5, backGround.height / 2, 60)
+    let pipe = []; //tạo mảng ống để chứa các ống di chuỷen
+    pipe[0] = {
+        x: canvas.width,
+        y: 0 // khởi tạo ống đầu tiên nằm bên phải ngoài cùng và y=0;
+    }
+
+    // new game
+    function play() {
+
+        // load hình ảnh vào
+        context.drawImage(backGround, 0, 0);
+        context.drawImage(birdImg, bird.x, bird.y);
+        // di chuyển ống
+        for (let i = 0; i < pipe.length; i++) {
+            spaceNorthToSouth = pipeNorth.height + spaceBetweenTwoPipesY;
+            context.drawImage(pipeNorth, pipe[i].x, pipe[i].y);
+            context.drawImage(pipeSouth, pipe[i].x, pipe[i].y + spaceNorthToSouth);
+            pipe[i].x -= 5;
+            //để ống di chuyển
+            // khi ống di chuyển đến giữa tạo thêm 1 ống nữa
+            if (pipe[i].x === canvas.width / 1.5) {
+                pipe.push({
+                    x: canvas.width,
+                    y: Math.floor(Math.random() * pipeNorth.height) - pipeNorth.height
+                })
+            }
+            // if (pipe[i].x === -10) pipe.splice(0, 1);// nếu ống đụng lề trái thì xóa nó đi
+            if (pipe[i].x === bird.x) {
+               score++;
+               point.play();
+            }
+            // check va cham => game over
+            if (bird.y + birdImg.height === canvas.height ||
+                bird.x + birdImg.width >= pipe[i].x && bird.x <= pipe[i].x + pipeNorth.width
+                && (bird.y <= pipe[i].y + pipeNorth.height ||
+                    bird.y + birdImg.height >= pipe[i].y + spaceNorthToSouth)
+            ) {
+                gamOver.play();
+                if(score > max){
+                    max = score;
+                    return max
+                }else {
+                    return max
+                }
+            }
+        }
+
+        scoreshow.innerHTML = "Score: " + score;
+        highScoreshow.innerHTML = "Hight Score: " +max
+        // cho bird rơi xuống
+        bird.y += 3;
+        requestAnimationFrame(play);
+
+    }
+    //Tốc độ bay của chim
+    document.addEventListener("click", function () {
+        bird.y -= bird.speed;
+        fly.play();
+    })
+    // reset pipe
+    function UpdatePipe() {
+        pipe = [];
+        pipe[0] = {
+            x: canvas.width,
+            y: 0
+        }
+    }
+
+    function start() {
+        score = 0;
+        bird.updateBird();
+        UpdatePipe()
+        play();
+    }
+
+    function reset() {
+        score = 0;
+        bird.updateBird();
+        UpdatePipe()
+    }
+
+
+
+</script>
 </html>
+
