@@ -16,8 +16,8 @@
 <script>
     let canvas = document.getElementById('gamezone');
     let context = canvas.getContext('2d');
-    let scoreshow = document.getElementById('score');
-    let highScoreshow = document.getElementById("hightScore");
+    let scoreShow = document.getElementById('score');
+    let highScoreShow = document.getElementById("hightScore");
     let score = 0;
     let max = 0 ;
     let count = 0;
@@ -100,6 +100,7 @@
                     bird.y + birdImg.height >= pipe[i].y + spaceNorthToSouth)
             ) {
                 gamOver.play();
+                alert("Thứ giết chết bạn không phải là kỉ niệm mà là dao phóng lợn ")
                 if(score > max){
                     max = score;
                     return max
@@ -109,8 +110,8 @@
             }
         }
 
-        scoreshow.innerHTML = "Score: " + score;
-        highScoreshow.innerHTML = "Hight Score: " +max
+        scoreShow.innerHTML = "Score: " + score;
+        highScoreShow.innerHTML = "Hight Score: " +max
         // cho bird rơi xuống
         bird.y += 3;
         requestAnimationFrame(play);
